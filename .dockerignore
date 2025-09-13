@@ -1,6 +1,8 @@
-/node_modules
-/dist
-/build
-/.idea
+node_modules
+dist
+build
+.idea
 .git
 .gitignore
+npm-debug.log
+.DS_Store
