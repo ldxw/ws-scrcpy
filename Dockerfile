@@ -1,4 +1,4 @@
-FROM node:24
+FROM node:16
 
 ENV LANG C.UTF-8
 WORKDIR /ws-scrcpy
