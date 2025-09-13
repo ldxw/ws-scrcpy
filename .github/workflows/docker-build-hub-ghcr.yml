@@ -1,0 +1,52 @@
+name: Docker ws-scrcpy
+
+on:
+  # push:
+  #  branches: [ "master" ]
+  workflow_dispatch:
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+  
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v4
+
+    - name: Set build date
+      id: vars
+      run: echo "DATE_TAG=$(date +'%Y%m%d')" >> $GITHUB_ENV
+      
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_PUBHUB_USER }}
+        password: ${{ secrets.DOCKER_PUBHUB_PASS }}
+        
+    - name: Log in to the Container registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and push multi-arch Docker Image
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        platforms: linux/amd64,linux/arm64
+        tags: |
+          ldxw/ws-scrcpy:latest
+          ldxw/ws-scrcpy:${{ env.DATE_TAG }}
+          ghcr.io/ldxw/ws-scrcpy:latest
+          ghcr.io/ldxw/ws-scrcpy:${{ env.DATE_TAG }}
